@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!--==================== Required meta tags always come first ====================-->
+    <meta charset="utf-8" />
+    <meta name="author" content="company Co" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <!--==================== SWIPER CSS ====================-->
+    <link rel="stylesheet" href="{% static 'assets/style/css/bootstrap.min.css' %}">
+
+    <!--==================== CSS ====================-->
+    <link rel="stylesheet" href="{% static 'assets/style/css/style.css' %}">
+    <!--==================== Fonts Awesome CSS ====================-->
+    <link rel="stylesheet" href="{% static 'assets/style/css/all.css' %}">
+
+
+</head>
+
+<body>
+    {% if user.is_authenticated %}
+
+
+
+        <!--==================== MAIN ====================-->
+        <main class="main" id="main">
+
+            
+            <!--==================== Blog ====================-->
+        
+            <section class="support">
+
+                <section class="container">
+                    <div class="about_section">
+                        <!-- support main -->
+                        <div class="row">
+                            <div class="col">
+
+                                <!-- support top title -->
+                                <div class="about_title col my-1">
+                                    <h2 class="head_title">
+                                        Feedback & Complaint
+                                    </h2>
+                                    <hr class="short">
+                                </div>
+                                <!-- support main data -->
+                                <div class="about_data col-12">
+                                    <div class="aboutUs_text">
+                                        <h5 class="second_title">
+                                            Website Feedback Form
+                                        </h5>
+                                        <hr class="short">
+                                            <form action="{% url 'show-survey' survey.id %}" method="POST">
+                                                {% csrf_token %}
+                                                {% for message in messages %}
+                                                    {% if 'success' in message.extra_tags %}
+                                                        <h1>{{message}}</h1>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {{ form.as_p }}
+
+                                                <div class="form-group d-flex justify-content-end slider_submit_btn">
+                                                    <button type="submit" class="button submit"
+                                                        id="feedback_btn">Send</button>
+
+                                                </div>
+                                                <!-- <input type="submit" name="submit" value="Submit" /> -->
+                                            </form>
+                                        <!-- <section class="col-12 my-3 feedback">
+                                            <form action="#" class="feedback_form row g-1">
+                                                <div class="form-group mb-2 col-12">
+                                                    <p class="feedback_title">
+                                                        Is this the first time you have visited the website?
+                                                    </p>
+                                                    <div class="form-check">
+
+                                                        <input class="form-check-input" type="radio" name="RadioDefault"
+                                                            id="RadioDefault1">
+                                                        <label class="form-check-label" for="RadioDefault1">
+                                                            Yes
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="RadioDefault"
+                                                            id="RadioDefault2" checked>
+                                                        <label class="form-check-label" for="RadioDefault2">
+                                                            No
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mb-2 col-12">
+                                                    <label class="label">
+
+                                                        What is the PRIMARY reason you came to the site?</label>
+                                                    <textarea placeholder="Type here..." name="Message"
+                                                        class="form-control header_text_area add_header" cols="30" rows="3">
+
+                                                    </textarea>
+                                                    <div class="feedback_counter">
+                                                        <span class="help-text"></span>
+                                                        <div class="characters">
+                                                            <span class="word_count">0 word </span>
+                                                            <span class="feedback_length">| 0 characters</span>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group mb-2 col-12">
+                                                    <p class="feedback_title">
+                                                        Did you find what you needed?
+                                                    </p>
+                                                    <div class="form-check">
+
+                                                        <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                                            id="flexRadioDefault3">
+                                                        <label class="form-check-label" for="flexRadioDefault3">
+                                                            Yes, all of it
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                                            id="flexRadioDefault4" checked>
+                                                        <label class="form-check-label" for="flexRadioDefault4">
+                                                            Yes, some of it
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                                            id="flexRadioDefault5" checked>
+                                                        <label class="form-check-label" for="flexRadioDefault5">
+                                                            No, none of it
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mb-2 col-12">
+                                                    <label class="label">
+
+                                                        If you did not find any or all of what you needed, please tell us
+                                                        what information you were looking for.</label>
+                                                    <textarea placeholder="Type here..." name="Message"
+                                                        class="form-control header_text_area add_header" cols="30" rows="3">
+
+                                                    </textarea>
+                                                    <div class="feedback_counter">
+                                                        <span class="help-text"></span>
+                                                        <div class="characters">
+                                                            <span class="word_count">0 word </span>
+                                                            <span class="feedback_length">| 0 characters</span>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group mb-2 col-12">
+                                                    <p class="feedback_title">
+                                                        Please tell us how easy it is to find information on the site.
+                                                    </p>
+                                                    <div class="form-check">
+
+                                                        <input class="form-check-input" type="radio" name="howEasy"
+                                                            id="how_easy_1">
+                                                        <label class="form-check-label" for="how_easy_1">
+                                                            Very Easy
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="howEasy"
+                                                            id="how_easy_2" checked>
+                                                        <label class="form-check-label" for="how_easy_2">
+                                                            Easy
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="howEasy"
+                                                            id="how_easy_3" checked>
+                                                        <label class="form-check-label" for="how_easy_3">
+                                                            Average
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="howEasy"
+                                                            id="how_easy_4" checked>
+                                                        <label class="form-check-label" for="how_easy_4">
+                                                            Difficult
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="howEasy"
+                                                            id="how_easy_5" checked>
+                                                        <label class="form-check-label" for="how_easy_5">
+                                                            Very Difficult
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mb-2 col-12">
+                                                    <label class="label">
+                                                        Please add any comments you have for improving the website. We
+                                                        welcome suggestions on specific areas for improvements, features you
+                                                        would like to see added to the site, and examples of what you
+                                                        consider good websites.</label>
+                                                    <textarea placeholder="Type here..." name="Message"
+                                                        class="form-control header_text_area add_header" cols="30" rows="3">
+
+                                                    </textarea>
+                                                    <div class="feedback_counter">
+                                                        <span class="help-text"></span>
+                                                        <div class="characters">
+                                                            <span class="word_count">0 word </span>
+                                                            <span class="feedback_length">| 0 characters</span>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="form-group d-flex justify-content-end slider_submit_btn">
+                                                    <button type="submit" class="button submit"
+                                                        id="feedback_btn">Send</button>
+
+                                                </div>
+
+
+                                            </form>
+                                        </section> -->
+
+
+                                    </div>
+
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </main>
+
+    {% else %}
+
+        <a href="{% url 'feedback:login' %}"><h1>You should Login</h1></a>
+
+    {% endif %}
+
+
+
+
+</body>
+
+

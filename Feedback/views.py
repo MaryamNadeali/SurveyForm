@@ -1,51 +1,115 @@
-from django.shortcuts import render, redirect
 from django.views import View
-from .models import MulQuestion, TxtQuestion, MultipleAnswer, Answer
-from .forms import FeedbackForm
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 
-# Create your views here.
+from .models import Survey,Submission
+from .forms import RegisterForm, LoginForm, SurveyForm
 
-class FeedbackFormView(View):
-    
+#==================================================RegisterView=============================================
+
+class RegisterView(View):
     def get(self, request):
+        register_form = RegisterForm()
+        return render(request,'account/register.html',{'register_form':register_form})
 
-        mul_que = MulQuestion.objects.all()
-        multiple_anses = MultipleAnswer.objects.all()
-        context = {
-            'mul_que' : mul_que,
-            'multiple_anses' : multiple_anses,
-            }
-        print(context)
-        return render(request, 'question/que.html', context)
-    
-    def post(self, request, *args, **kwargs):
-        print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
-        form = FeedbackForm()
-        questions = MulQuestion.objects.all()
-        multiple_anses = MultipleAnswer.objects.all()
-        if request.method == 'POST': 
-            form = FeedbackForm(request.POST)
-            if form.is_valid():
-                print('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww')
-                bool_ans = form.cleaned_data.get('bool_ans')
-                for question in questions:
-                    if question.type == 'multianswer':
-                        print('question',question)
-                        multiple_anses = MultipleAnswer.objects.all().filter(que=question)
-                        print('aaaaaaaaaaaaaaaaaaaaaa',multiple_anses)
-                        for i in range(0,len(multiple_anses)):
-                                answer = Answer.objects.create(que=question,ans=multiple_anses[i],bool_ans=bool_ans) 
-                                answer.save()
-                    else:
-                        txt_ans = form.cleaned_data.get('txt_ans')
-                        answer = Answer.objects.create(que=self.question,txt_ans=txt_ans)
-                        answer.save()
-                return redirect(request, 'question/end.html') 
-            
+    def post(self, request):
+        register_form = RegisterForm()
+        if request.method == 'POST':
+            register_form = RegisterForm(request.POST)
+            if register_form.is_valid():
+                user = register_form.save()
+                user.set_password(user.password)
+                user.save()
+                messages.success(request,'ثبت اطلاعات با موفقیت انجام شد')
+                return redirect('feedback:login')
             else:
-                return render(request, 'question/que.html')           
-                
+                messages.error(request, 'اطلاعات وارد شده معتبر نمی باشد')
+                return render(request, 'account/register.html', {'register_form': register_form})
+
         else:
-            return render(request, 'question/que.html')
-                    
+            messages.error(request, 'اطلاعات وارد شده معتبر نمی باشد')
+            return render(request, 'account/register.html', {'register_form': register_form})
+
+#==================================================LoginView================================================
+
+class LoginView(View):
+    def get(self,request):
+        login_form = LoginForm()
+        return render(request, 'account/login.html', {'login_form':login_form})
+
+    def post(self, request):
+        login_form = LoginForm()
+        username = request.POST['username']
+        password = request.POST['password']
         
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('feedback:feedbacks')
+        else:
+            messages.warning(request,'کاربر با این مشخصات یافت نشد')
+            return render(request, 'account/login.html', {'login_form':login_form})
+
+#===============================================SelectSurveyView===========================================
+
+class SelectSurveyView(View):
+
+    def get(self, request):
+        feedbacks = Survey.objects.all().filter(status='pub')
+        context = {
+            'feedbacks': feedbacks,
+        }
+
+        return render(request, 'account/select_survey.html',context)
+
+
+#==================================================Surveyview===============================================
+def index(request):
+    return render(request, "lewagon/index.html")
+
+def show_survey(request, id=None):
+    survey = get_object_or_404(Survey, pk=id)
+    user = request.user
+    # if submission is None:
+    post_data = request.POST if request.method == "POST" else None
+    form = SurveyForm(survey, post_data)
+
+    url = reverse("show-survey", args=(id,))
+    if form.is_bound and form.is_valid():
+        form.save(user=request.user, commit=False)
+        submission = Submission.objects.all().last()
+        tracking_code = submission.tracking_code
+        messages.add_message(request, messages.INFO, 'Submissions saved. \n Your Tracking Code is %s' %tracking_code, extra_tags='success')
+        # messages.add_message(request, messages.INFO, 'Your Tracking Code is %s' %tracking_code, extra_tags='tracking_code')
+        return redirect(url)
+
+    else:
+        context = {
+        "survey": survey,
+        "form": form,
+        }
+        return render(request, "feedback/survey.html", context)
+    # else:
+    #     context = {
+    #         "survey": survey,
+    #         }
+    #     messages.add_message(request, messages.INFO, 'You fielled this form before.')
+    #     return render(request, "feedback/survey.html", context)
+
+
+#=======================================================SaveFormAndDisplayCodeView=====================================================
+
+class DisplayCodeView(View):
+
+    def get(self, request):
+        submission = Submission.objects.all().last()
+        tracking_code = submission.tracking_code
+        context = {
+            'tracking_code': tracking_code,
+
+        }
+        return render(request, 'feedback/end.html', context)

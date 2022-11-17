@@ -1,0 +1,12 @@
+<h1>Survey List</h1>
+
+<ul>
+    {% for survey in feedbacks %}
+        <a href="{% url 'show-survey' survey.id %}"><li>{{survey.title}}</li> </a>
+    {% endfor %}
+</ul>
+
+
+
+
+
